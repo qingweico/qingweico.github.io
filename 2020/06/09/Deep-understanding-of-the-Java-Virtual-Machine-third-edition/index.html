@@ -287,6 +287,8 @@
 </li>
 <li>初始化</li>
 </ul>
+<span id="more"></span>
+
 <figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">执行类构造器方法&lt;clinit&gt;()</span></span><br><span class="line"><span class="attr">此方法不需要定义,</span> <span class="string">是javac编译器自动收集类中的所有类变量的赋值动作和静态代码块中的语句合并而来</span></span><br><span class="line"><span class="attr">构造器方法中指令按语句在源文件中出现的顺序执行</span></span><br><span class="line"><span class="attr">&lt;clinit&gt;不同于类的构造器(关联</span>: <span class="string">构造器是虚拟机视角下的&lt;init&gt;())</span></span><br><span class="line"><span class="attr">若该类具有父类,</span> <span class="string">JVM会保证子类的&lt;clinit&gt;()执行前, 父类的&lt;clinit&gt;()已经执行完毕</span></span><br><span class="line"><span class="attr">虚拟机必须保证一个类的&lt;clinit&gt;()方法在多线程下被同步加锁</span></span><br></pre></td></tr></table></figure>
 
 <p>对于初始化阶段 《Java虚拟机规划》 严格定义了有且只有六种情况必须对类进行初始化</p>
@@ -1283,13 +1285,12 @@
         
   <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">豫ICP备2020030311号 </a>
   </div>
-<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <div class="copyright">
   
   &copy; 2019 – 
   <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
-    <i class="fa-solid fa-stars"></i>
+    <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">启明</span>
     <span class="post-meta-divider">|</span>
@@ -1299,10 +1300,18 @@
       <span class="post-meta-item-text">站点总字数：</span>
     <span title="站点总字数">36k</span>
 </div>
-<div class="powered-by">
-<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
-  本站访客数:<span id="busuanzi_value_site_uv"></span>
-</span>
+
+<div class="busuanzi-count">
+    <script async="" src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      访问用户： <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 人
+    </span>
+    <div class="powered-by"></div>
+    <span class="site-uv">
+      <i class="fa fa-eye"></i>
+      访问次数： <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次
+    </span>
 </div>
 
         

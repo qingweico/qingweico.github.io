@@ -263,6 +263,8 @@
 <p>Java主要的同步机制是关键字synchronized,它提供了一种独占的加锁方式,但是”同步”这个术语还包括volatile类型的变量,显示锁(Explicit lock)以及原子变量</p>
 <p>完全由线程安全的类构成的程序不一定就是线程安全的, 而在线程安全类中也可以包含非线程安全的类</p>
 <p>正确性的含义就是:ok_hand: :某个类的行为与其规范完全一致</p>
+<span id="more"></span>
+
 <p>线程安全性的定义:taurus:: 当多个线程访问某个类时, 这个类始终都能表现出正确的行为, 那么就称这个类是线程安全的</p>
 <p>或者这样定义:alien::一个在并发环境和单线程环境中都不会被破坏的类</p>
 <p>类的无状态:yum::它既不包含任何域, 也不包含任何对其他类中域的引用. 计算过程中的临时状态仅存在于线程栈上的局部变量上, 并且只能由正在执行的线程访问</p>
@@ -547,13 +549,12 @@
         
   <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">豫ICP备2020030311号 </a>
   </div>
-<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <div class="copyright">
   
   &copy; 2019 – 
   <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
-    <i class="fa-solid fa-stars"></i>
+    <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">启明</span>
     <span class="post-meta-divider">|</span>
@@ -563,10 +564,18 @@
       <span class="post-meta-item-text">站点总字数：</span>
     <span title="站点总字数">36k</span>
 </div>
-<div class="powered-by">
-<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
-  本站访客数:<span id="busuanzi_value_site_uv"></span>
-</span>
+
+<div class="busuanzi-count">
+    <script async="" src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      访问用户： <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 人
+    </span>
+    <div class="powered-by"></div>
+    <span class="site-uv">
+      <i class="fa fa-eye"></i>
+      访问次数： <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次
+    </span>
 </div>
 
         
