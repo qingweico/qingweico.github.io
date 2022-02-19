@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #81C785; /*进度条颜色*/
+        height: 1px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #81C785, 0 0 5px     #81C785; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color:#81C785;    /*上边框颜色*/
+        border-left-color:#81C785;    /*左边框颜色*/
+    }
+</style>
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png">
+  <link rel="mask-icon" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="目录[TOC] redis persistenceRedis 的持久化主要有两大机制, 即 AOF (Append Only File) 日志和 RDB 快照 RDB(Redis Database)内存快照, 就是指内存中的数据在某一个时刻的状态记录 在指定的时间间隔内将内存中的数据集快照写入磁盘, 即快照; 数据恢复时直接将快照文件读入内存中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis持久化">
+<meta property="og:url" content="http://example.com/2020/07/12/redis%E6%8C%81%E4%B9%85%E5%8C%96/index.html">
+<meta property="og:site_name" content="流金岁月">
+<meta property="og:description" content="目录[TOC] redis persistenceRedis 的持久化主要有两大机制, 即 AOF (Append Only File) 日志和 RDB 快照 RDB(Redis Database)内存快照, 就是指内存中的数据在某一个时刻的状态记录 在指定的时间间隔内将内存中的数据集快照写入磁盘, 即快照; 数据恢复时直接将快照文件读入内存中">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.qingweico.cn/blog/72f547f18dbac788c7d11yy167d7ebf8.jpg">
+<meta property="article:published_time" content="2020-07-12T01:21:23.000Z">
+<meta property="article:modified_time" content="2022-02-14T02:06:12.000Z">
+<meta property="article:author" content="启明">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="NOSQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.qingweico.cn/blog/72f547f18dbac788c7d11yy167d7ebf8.jpg">
+
+<link rel="canonical" href="http://example.com/2020/07/12/redis%E6%8C%81%E4%B9%85%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>redis持久化 | 流金岁月</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="流金岁月" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">流金岁月</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">流金岁月</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/07/12/redis%E6%8C%81%E4%B9%85%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://cdn.qingweico.cn/blog/53fd3cbe09ce49fe809c0dbb32a2f232.jfif">
+      <meta itemprop="name" content="启明">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="流金岁月">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          redis持久化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-12 09:21:23" itemprop="dateCreated datePublished" datetime="2020-07-12T09:21:23+08:00">2020-07-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-02-14 10:06:12" itemprop="dateModified" datetime="2022-02-14T10:06:12+08:00">2022-02-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NOSQL/" itemprop="url" rel="index"><span itemprop="name">NOSQL</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h1><p>[TOC]</p>
+<h2 id="redis-persistence"><a href="#redis-persistence" class="headerlink" title="redis persistence"></a>redis persistence</h2><p>Redis 的持久化主要有两大机制, 即 AOF (Append Only File) 日志和 RDB 快照</p>
+<h3 id="RDB-Redis-Database"><a href="#RDB-Redis-Database" class="headerlink" title="RDB(Redis Database)"></a>RDB(Redis Database)</h3><p>内存快照, 就是指内存中的数据在某一个时刻的状态记录</p>
+<p>在指定的时间间隔内将内存中的数据集快照写入磁盘, 即快照; 数据恢复时直接将快照文件读入内存中</p>
+<span id="more"></span>
+
+<p>给哪些内存数据做快照?</p>
+<p>为了提供所有数据的可靠性保证, 它执行的是全量快照</p>
+<p>Redis 提供了两个命令来生成 RDB 文件, 分别是 save 和 bgsave</p>
+<ul>
+<li>save: 在主线程中执行, 会导致阻塞</li>
+<li>bgsave: 创建一个子进程, 专门用于写入 RDB 文件, 避免了主线程的阻塞, 这也是 Redis RDB 文件生成的默认配置</li>
+</ul>
+<p>快照时数据能修改吗?</p>
+<p>为了保证快照完整性, 主线程只能处理读操作, 因为不能修改正在执行快照的数据, 为了保证Redis 的性能 Redis 就会借助操作系统提供的写时复制技术(Copy-On-Write, COW), 在执行快照的同时, 正常处理写操作 bgsave 子进程是由主线程 fork 生成的, 可以共享主线程的所有内存数据; bgsave 子进程运行后, 开始读取主线程的内存数据, 并把它们写入 RDB 文件</p>
+<p>虽然 bgsave 执行时不阻塞主线程, 但是, 如果频繁地执行全量快照, 也会带来两方面的开销</p>
+<ul>
+<li>频繁将全量数据写入磁盘, 会给磁盘带来很大压力, 多个快照竞争有限的磁盘带宽, 前一个快照还没有做完, 后一个又开始做了, 容易造成恶性循环</li>
+<li>bgsave 子进程需要通过 fork 操作从主线程创建出来; 虽然, 子进程在创建后不会再阻塞主线程, 但是, fork 这个创建过程本身会阻塞主线程, 而且主线程的内存越大, 阻塞时间越长; 如果频繁 fork 出 bgsave 子进程, 这就会频繁阻塞主线程了(所以, 在 Redis 中如果有一个 bgsave 在运行, 就不会再启动第二个 bgsave 子进程)</li>
+</ul>
+<p>解决: 增量快照, 就是指, 做了一次全量快照后, 后续的快照只对修改的数据进行快照记录, 这样可以避免每次全量快照的开销</p>
+<p>比较AOF: 虽然跟 AOF 相比, 快照的恢复速度快(只需要把 RDB 文件直接读入内存, 这就避免了 AOF 需要顺序、逐一重新执行操作命令带来的低效性能问题), 但是, 快照的频率不好把握, 如果频率太低, 两次快照间一旦宕机, 就可能有比较多的数据丢失, 如果频率太高, 又会产生额外开销</p>
+<p>混合使用 AOF 日志和内存快照: 内存快照以一定的频率执行, 在两次快照之间, 使用 AOF 日志记录这期间的所有命令操作</p>
+<p>在两次快照之间进行的数据修改操作, 用 AOF 日志记录, 等到第二次做全量快照时, 就可以清空 AOF 日志, 因为此时的修改都已经记录到快照中了, 恢复时就不再用日志了</p>
+<h4 id="SNAPSHOTTING快照"><a href="#SNAPSHOTTING快照" class="headerlink" title="SNAPSHOTTING快照"></a>SNAPSHOTTING快照</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">dbfilename dump.rdb   # 默认持久化到dump.rdb文件中 </span><br><span class="line">save 900 1            # 15分钟内保存一次即修改一次</span><br><span class="line">save 300 10           # 5分钟内保存十次即修改十次</span><br><span class="line">save 60 10000         # 1分钟内保存一万次即修改一万次</span><br><span class="line">stop-writes-on-bgsave-error yes  # 保存出错停止写入</span><br><span class="line">rdbcompression yes    # 数据压缩</span><br><span class="line">rdbchecksum yes       # 数据校验</span><br><span class="line">dir ./                </span><br><span class="line">config get dir        # 获取redis启动路径</span><br><span class="line">save                  # 手动备份</span><br></pre></td></tr></table></figure>
+
+<p>RDB适合大规模的数据恢复, 而且对数据的完整性和一致性要求不高</p>
+<h3 id="AOF-Append-Only-File"><a href="#AOF-Append-Only-File" class="headerlink" title="AOF(Append Only File)"></a>AOF(Append Only File)</h3><p>数据库的写前日志(Write Ahead Log, WAL), 也就是说, 在实际写数据前, 先把修改的数据记到日志文件中(redo log和binlog是在commit之前写的日志),<br>以便故障时进行恢复; 不过, AOF 日志正好相反, 它是写后日志, “写后”的意思是 Redis 是先执行命令, 把数据写入内存, 然后才记录日志</p>
+<p>传统数据库的日志, 例如 redo log(重做日志), 记录的是修改后的数据, 而 AOF 里记录的是 Redis 收到的每一条命令, 这些命令是以文本形式保存</p>
+<p>AOF 为什么要先执行命令再记日志?</p>
+<p>为了避免额外的检查开销, Redis 在向 AOF 里面记录日志的时候, 并不会先去对这些命令进行语法检查; 所以, 如果先记日志再执行命令的话, 日志中就有可能记录了错误的命令, Redis 在使用日志恢复数据时, 就可能会出错</p>
+<p>Redis 使用写后日志这一方式的一大好处是, 可以避免出现记录错误命令的情况; 除此之外, AOF 还有一个好处: 它是在命令执行后才记录日志, 所以不会阻塞当前的写操作</p>
+<p>AOF 两个潜在的风险:</p>
+<p>如果刚执行完一个命令, 还没有来得及记日志就宕机了, 那么这个命令和相应的数据就有丢失的风险</p>
+<p>AOF 虽然避免了对当前命令的阻塞, 但可能会给下一个操作带来阻塞风险; 这是因为, AOF 日志也是在主线程中执行的, 如果在把日志文件写入磁盘时, 磁盘写压力大, 就会导致写盘很慢, 进而导致后续的操作也无法执行了</p>
+<p>以日志的形式记录每个写操作, 将Redis所有的写指令记录下来(不记录读操作), 只许追加文件不许修改文件, 相当于MySQL的脚本文件, 当Redis启动时就会加载appendonly.aof文件将写指令重新执行一遍来恢复数据</p>
+<p>AOF 三种写回策略</p>
+<ul>
+<li><p>always, 同步写回: 每个写命令执行完, 立马同步地将日志写回磁盘</p>
+</li>
+<li><p>everysec, 每秒写回: 每个写命令执行完, 只是先把日志写到 AOF 文件的内存缓冲区, 每隔一秒把缓冲区中的内容写入磁盘</p>
+</li>
+<li><p>no, 操作系统控制的写回: 每个写命令执行完, 只是先把日志写到 AOF 文件的内存缓冲区, 由操作系统决定何时将缓冲区内容写回磁盘</p>
+</li>
+</ul>
+<p><img src="https://cdn.qingweico.cn/blog/72f547f18dbac788c7d11yy167d7ebf8.jpg" alt="img"></p>
+<p>AOF 重写机制</p>
+<p>产生原因:</p>
+<p>AOF 是以文件的形式在记录接收到的所有写命令, 随着接收的写命令越来越多, AOF 文件会越来越大, AOF 文件过大会带来性能问题</p>
+<ul>
+<li>文件系统本身对文件大小有限制, 无法保存过大的文件</li>
+<li>如果文件太大, 之后再往里面追加命令记录的话, 效率也会变低</li>
+<li>如果日志文件太大, 整个恢复过程就会非常缓慢</li>
+</ul>
+<p>AOF 重写机制就是在重写时, Redis 根据数据库的现状创建一个新的 AOF 文件, 也就是说, 读取数据库中的所有键值对, 然后对每一个键值对用一条命令记录它的写入</p>
+<p>旧日志文件中的多条命令, 在重写后的新日志中变成了一条命令(AOF 文件是以追加的方式, 逐一记录接收到的写命令的; 当一个键值对被多条写命令反复修改时, AOF 文件会记录相应的多条命令; 但是, 在重写的时候, 是根据这个键值对当前的最新状态, 为它生成对应的写入命令)</p>
+<p>注意, AOF的重写不是根据原有的AOF去做, 而是根据当前内存数据库的数据, 去生成一条条命令进行保存</p>
+<p>和 AOF 日志由主线程写回不同, 重写过程是由后台子进程 bgrewriteaof 来完成的, 这也是为了避免阻塞主线程, 导致数据库性能下降</p>
+<h4 id="APPEND-ONLY-MODE"><a href="#APPEND-ONLY-MODE" class="headerlink" title="APPEND ONLY MODE"></a>APPEND ONLY MODE</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">appendonly no  # 默认关闭 yes即代表打开aof的持久化</span><br><span class="line">appendfilename &quot;appendonly.aof&quot;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-check-aof --fix appendonly.aof <span class="comment"># 修复appendonly.aof文件</span></span><br></pre></td></tr></table></figure>
+
+<p>dump.rdb文件和appendonly.aof文件可以同时存在,当二者同时存在时优先加载appendonly.aof文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">appendfsync always <span class="comment"># 同步持久化 每当有数据发生变化时就会记录到磁盘 数据完整性好但是性能差</span></span></span><br><span class="line">appendfsync everysec # 出厂默认 异步操作 每秒记录数据 1s内宕机 数据丢失</span><br><span class="line"><span class="meta"># </span><span class="language-bash">appendfsync no</span></span><br></pre></td></tr></table></figure>
+
+<p>关于 AOF 和 RDB 的选择问题</p>
+<ul>
+<li>数据不能丢失时, 内存快照和 AOF 的混合使用是一个很好的选择;</li>
+<li>如果允许分钟级别的数据丢失, 可以只使用 RDB;</li>
+<li>如果只用 AOF, 优先使用 everysec 的配置选项, 因为它在可靠性和性能之间取了一个平衡</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">rss</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+              <a href="/tags/NOSQL/" rel="tag"># NOSQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/12/redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/" rel="prev" title="redis数据类型">
+      <i class="fa fa-chevron-left"></i> redis数据类型
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/19/article/" rel="next" title="心灵">
+      心灵 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#redis-persistence"><span class="nav-number">1.1.</span> <span class="nav-text">redis persistence</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB-Redis-Database"><span class="nav-number">1.1.1.</span> <span class="nav-text">RDB(Redis Database)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SNAPSHOTTING%E5%BF%AB%E7%85%A7"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">SNAPSHOTTING快照</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF-Append-Only-File"><span class="nav-number">1.1.2.</span> <span class="nav-text">AOF(Append Only File)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#APPEND-ONLY-MODE"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">APPEND ONLY MODE</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="启明"
+      src="https://cdn.qingweico.cn/blog/53fd3cbe09ce49fe809c0dbb32a2f232.jfif">
+  <p class="site-author-name" itemprop="name">启明</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/qingweico" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;qingweico" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zqingwei99@gmail.com" title="E-Mail → mailto:zqingwei99@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">豫ICP备2020030311号 </a>
+  </div>
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">启明</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">83k</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

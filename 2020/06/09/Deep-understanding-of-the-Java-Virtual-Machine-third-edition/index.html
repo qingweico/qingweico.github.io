@@ -220,14 +220,7 @@
                 </span>
             </span>
 
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
+          <br>
             <span class="post-meta-item" title="本文字数">
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
@@ -274,8 +267,6 @@
 </li>
 <li>初始化</li>
 </ul>
-<span id="more"></span>
-
 <figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">执行类构造器方法&lt;clinit&gt;()</span></span><br><span class="line"><span class="attr">此方法不需要定义,</span> <span class="string">是javac编译器自动收集类中的所有类变量的赋值动作和静态代码块中的语句合并而来</span></span><br><span class="line"><span class="attr">构造器方法中指令按语句在源文件中出现的顺序执行</span></span><br><span class="line"><span class="attr">&lt;clinit&gt;不同于类的构造器(关联</span>: <span class="string">构造器是虚拟机视角下的&lt;init&gt;())</span></span><br><span class="line"><span class="attr">若该类具有父类,</span> <span class="string">JVM会保证子类的&lt;clinit&gt;()执行前, 父类的&lt;clinit&gt;()已经执行完毕</span></span><br><span class="line"><span class="attr">虚拟机必须保证一个类的&lt;clinit&gt;()方法在多线程下被同步加锁</span></span><br></pre></td></tr></table></figure>
 
 <p>对于初始化阶段 《Java虚拟机规划》 严格定义了有且只有六种情况必须对类进行初始化</p>
@@ -461,7 +452,7 @@
 
 <figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">-Xms20m</span> <span class="string">-Xmx20m(默认单位字节) -XX:+PrintGCDetails</span></span><br></pre></td></tr></table></figure>
 
-<p>现代垃圾收集器都基于分代收集理论设计, 堆内存<strong>逻辑</strong>上细分为新生代、老年代以及元空间(Java8之前叫做永久代)</p>
+<p>现代垃圾收集器都基于分代收集理论设计, 堆内存<strong>逻辑</strong>上细分为新生代(New)、老年代(Tenured, Old )以及元空间(Metaspace)(Java8之前叫作永久代)</p>
 <h4 id="2-4-1-堆空间大小的设置"><a href="#2-4-1-堆空间大小的设置" class="headerlink" title="2.4.1  堆空间大小的设置"></a>2.4.1  堆空间大小的设置</h4><ul>
 <li><p>-Xms 用于设置堆区的起始内存(年轻代 +老年代), 等价于-XX:InitialHeapSize</p>
 </li>
@@ -492,7 +483,7 @@
 <li><p>其中年轻代又可以划分为Eden空间、Survivor0空间和Survivor1空间(有时也叫from区、to区 s0&#x2F;s1 空的为to区)</p>
 </li>
 <li><p>配置年轻代和老年代在堆结构的占比</p>
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">-XX</span>:<span class="string">NewRatio=2 表示新生代占1.老年代占2, 新生代占整个堆的1/3</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">-XX</span>:<span class="string">NewRatio=2 表示新生代占1 老年代占2, 新生代占整个堆的1/3</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>查看默认年轻代和老年代在堆结构的占比</p>
 <figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 显示当前所有java进程pid</span></span><br><span class="line"><span class="attr">jps</span></span><br><span class="line"><span class="comment"># 查看默认年轻代和老年代在堆结构的占比为2(新生代占1.老年代占2)</span></span><br><span class="line"><span class="attr">jinfo</span> <span class="string">-flag NewRatio pid</span></span><br><span class="line"><span class="attr">&gt;&gt;&gt;</span> <span class="string">-XX:NewRatio=2</span></span><br><span class="line"><span class="comment"># 查看Eden空间和另外两个Survivor空间缺省所占的比例(默认Eden空间占8份)</span></span><br><span class="line"><span class="attr">jinfo</span> <span class="string">-flag SurvivorRatio 进程pid</span></span><br><span class="line"><span class="attr">&gt;&gt;&gt;</span> <span class="string">-XX:SurvivorRatio=8</span></span><br></pre></td></tr></table></figure>
@@ -748,7 +739,7 @@
 <li>是否偏向</li>
 </ul>
 </li>
-<li>Lock Records Address<ul>
+<li>Lock Record Address<ul>
 <li>轻量级锁(指向栈中的锁记录)</li>
 <li>检查Mark Word是否指向当前线程的栈</li>
 </ul>
@@ -760,7 +751,7 @@
 <li>偏向时间戳</li>
 </ul>
 </li>
-<li>类型指针: 指向类元数据InstanceClass, 确定该对象所属的类型</li>
+<li>类型指针: 指向类元数据InstanceClass, 确定该对象所属的类型(指向方法区对象数据类型的指针)</li>
 <li>如果是数组, 还需记录数组的长度</li>
 </ul>
 <h4 id="2-7-2-实例数据-Instance-Data"><a href="#2-7-2-实例数据-Instance-Data" class="headerlink" title="2.7. 2 实例数据 (Instance Data)"></a>2.7. 2 实例数据 (Instance Data)</h4><p>它是对象真正存储的有效信息, 包括程序代码中定义的各种类型的字段(包括从父类继承下来的本身拥有的字段)</p>
@@ -1145,12 +1136,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/03/24/Java-Concurrency-in-Practice/" rel="prev" title="Java Concurrency in Practice">
-      <i class="fa fa-chevron-left"></i> Java Concurrency in Practice
+    <a href="/2020/04/12/nginx%E5%AE%89%E8%A3%85/" rel="prev" title="nginx安装">
+      <i class="fa fa-chevron-left"></i> nginx安装
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/08/19/article/" rel="next" title="心灵">
-      心灵 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/07/12/redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/" rel="next" title="redis数据类型">
+      redis数据类型 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -1226,18 +1217,18 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">13</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1283,30 +1274,10 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">36k</span>
+    <span title="站点总字数">83k</span>
 </div>
 
         
-<div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
 
 
 

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #81C785; /*进度条颜色*/
+        height: 1px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #81C785, 0 0 5px     #81C785; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color:#81C785;    /*上边框颜色*/
+        border-left-color:#81C785;    /*左边框颜色*/
+    }
+</style>
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png">
+  <link rel="mask-icon" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="redis[TOC] redis基本知识redis:  一种分布式的内存数据库缓存 NoSQL:  Not Only SQL “不仅仅是SQL” 泛指非关系型数据库 单进程 redis默认16个库,下表从开始,初始化使用0号库 大数据时代的三V :  Volume(海量) Variety(多样) Velocity(实时) 互联网三高: 高性能 高可用 高扩展  高性能: 响应(低延迟) 吞吐(高吞">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis数据类型">
+<meta property="og:url" content="http://example.com/2020/07/12/redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/index.html">
+<meta property="og:site_name" content="流金岁月">
+<meta property="og:description" content="redis[TOC] redis基本知识redis:  一种分布式的内存数据库缓存 NoSQL:  Not Only SQL “不仅仅是SQL” 泛指非关系型数据库 单进程 redis默认16个库,下表从开始,初始化使用0号库 大数据时代的三V :  Volume(海量) Variety(多样) Velocity(实时) 互联网三高: 高性能 高可用 高扩展  高性能: 响应(低延迟) 吞吐(高吞">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-12T01:21:23.000Z">
+<meta property="article:modified_time" content="2020-07-12T01:21:23.000Z">
+<meta property="article:author" content="启明">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="NOSQL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2020/07/12/redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>redis数据类型 | 流金岁月</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="流金岁月" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">流金岁月</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">流金岁月</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/07/12/redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://cdn.qingweico.cn/blog/53fd3cbe09ce49fe809c0dbb32a2f232.jfif">
+      <meta itemprop="name" content="启明">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="流金岁月">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          redis数据类型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-12 09:21:23" itemprop="dateCreated datePublished" datetime="2020-07-12T09:21:23+08:00">2020-07-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NOSQL/" itemprop="url" rel="index"><span itemprop="name">NOSQL</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="redis"><a href="#redis" class="headerlink" title="redis"></a>redis</h1><p>[TOC]</p>
+<h2 id="redis基本知识"><a href="#redis基本知识" class="headerlink" title="redis基本知识"></a>redis基本知识</h2><p>redis:  一种分布式的内存数据库缓存</p>
+<p>NoSQL:  Not Only SQL “不仅仅是SQL” 泛指非关系型数据库</p>
+<p>单进程</p>
+<p>redis默认16个库,下表从开始,初始化使用0号库</p>
+<p>大数据时代的三V :  Volume(海量) Variety(多样) Velocity(实时)</p>
+<p>互联网三高: 高性能 高可用 高扩展 </p>
+<p>高性能: 响应(低延迟) 吞吐(高吞吐量 高并发)</p>
+<p>TPS QPS</p>
+<p>amdahl定律</p>
+<span id="more"></span>
+
+<h3 id="RDBMS和NoSQL的区别"><a href="#RDBMS和NoSQL的区别" class="headerlink" title="RDBMS和NoSQL的区别"></a>RDBMS和NoSQL的区别</h3><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">RDBMS</span>: <span class="string">高度组织化结构化的数据</span></span><br><span class="line">      <span class="attr">结构化查询语言(SQL)</span></span><br><span class="line">      <span class="attr">数据操纵语言,数据定义语言</span></span><br><span class="line">      <span class="attr">严格的一致性</span></span><br><span class="line">      <span class="attr">基础事务</span></span><br><span class="line"><span class="attr">NoSQL</span>: <span class="string">代表的不仅仅是SQL</span></span><br><span class="line">      <span class="attr">没有声明性查询语言</span></span><br><span class="line">      <span class="attr">没有预定义的模式</span></span><br><span class="line">      <span class="attr">键值存储</span> <span class="string">文档存储 列存储 图形存储</span></span><br><span class="line">      <span class="attr">最终一致性而非ACID属性</span></span><br><span class="line">      <span class="attr">非结构化和不可预知的数据</span></span><br><span class="line">      <span class="attr">CAP属性</span></span><br><span class="line">      <span class="attr">高性能</span> <span class="string">高可用 可伸缩性  </span></span><br></pre></td></tr></table></figure>
+
+<h3 id="分布式"><a href="#分布式" class="headerlink" title="分布式"></a>分布式</h3><p>不同的多台服务器上面部署不同的服务模块(工程),他们之间通过RPC(Remote Procedure Call  远程过程调用)&#x2F;RMI之间通信和调用,对外提供服和组内协作</p>
+<h3 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h3><p>不同的多台服务器上面部署相同的服务模块,通过分布式调度软件进行统一的调度,对外提供访问和服务</p>
+<h3 id="分布式数据库中的CAP和BASE"><a href="#分布式数据库中的CAP和BASE" class="headerlink" title="分布式数据库中的CAP和BASE"></a>分布式数据库中的CAP和BASE</h3><h4 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h4><ul>
+<li>C: Consistency（强一致性）</li>
+<li>A: Availability（可用性）</li>
+<li>P: Partition tolerance（分区容错性）</li>
+</ul>
+<h4 id="BASE"><a href="#BASE" class="headerlink" title="BASE"></a>BASE</h4><ul>
+<li>基本可用（Basically Available）</li>
+<li>软状态（Soft State）</li>
+<li>最终一致（Eventually Consistent）</li>
+</ul>
+<h3 id="Key"><a href="#Key" class="headerlink" title="Key"></a>Key</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> k1 v1</span><br><span class="line"><span class="built_in">set</span> k2 v2       <span class="comment"># 设置键值</span></span><br><span class="line">get k1</span><br><span class="line">get k2          <span class="comment"># 获取键值</span></span><br><span class="line"><span class="built_in">set</span> k1 value1   <span class="comment"># 会覆盖当前的值</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">move k1 2;      <span class="comment"># 将键k1的值移动到2号库</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">exists k1       <span class="comment"># 判断某个键是否存在</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">expire k1 10    <span class="comment"># 设定键k1过期时间(s)</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ttl k1          <span class="comment"># 查看键k1剩余过期时间  -1代表永不过期 -2代表已过期 过期即从当前库中移出该键值对</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span> k          <span class="comment"># 查看k的数据类型</span></span><br></pre></td></tr></table></figure>
+
+<p><code>dbsize</code> 查看当前数据库的key数量</p>
+<p><code>flushdb</code> 清空当前库</p>
+<p><code>flushall</code> 清空所有的库</p>
+<p><code>keys *</code> 查看当前库的所有的键</p>
+<p><code>keys k?</code> 查看当前库中以<code>k</code> 开头的键</p>
+<p><code>select index(0~15)</code> 选择库</p>
+<h2 id="Redis5种数据类型"><a href="#Redis5种数据类型" class="headerlink" title="Redis5种数据类型"></a>Redis5种数据类型</h2><h3 id="String-字符串-（一key单value）"><a href="#String-字符串-（一key单value）" class="headerlink" title="String(字符串)（一key单value）"></a>String(字符串)（一key单value）</h3><p>string是redis最基本的类型,一个key对应一个value string是二进制安全的,redis的string可以包含任何数据,一个redis的string的value最多可以是512M</p>
+<p>string类型的内部编码有三种</p>
+<ul>
+<li>int 储存八个字节的长整型</li>
+<li>embstr 代表embstr格式的SDS(Simple Dynamic String) 简单动态字符串, 用来储存小于44个字节的字符串, 只分配一次内存空间(因为Redis和SDS是连续的)</li>
+<li>raw:  储存大于44个字节的字符串, 需要分配两次内存空间</li>
+</ul>
+<p>redis中浮点数和大整数怎么存</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">del k1           <span class="comment"># 删除k1</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">append k1 value  <span class="comment"># 向k1后面追加value</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strlen k1        <span class="comment"># 查看k1的长度</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>k的值一定要为数字类型</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">incr k1          <span class="comment"># 单步增加k1的值</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">decr k1          <span class="comment"># 单步递减k1的值</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">incrby k1 2      <span class="comment"># 自定义步长增加k1的值</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">decrby k1 2      <span class="comment"># 自定义步长递减k1的值</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> k abcdefg;</span><br><span class="line">GETRANGE k 0 3;  <span class="comment"># &quot;abcd&quot;  不会改变原来的值</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SETRANGE k 0 ABCD;</span><br><span class="line">get k;            <span class="comment"># &quot;ABCDefg&quot; 从索引0开始重新设置 会覆盖原来的值</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">setex k 10 v;</span><br><span class="line">=&gt;</span><br><span class="line"><span class="built_in">set</span> k v;</span><br><span class="line">expire k 10;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setnx k 10 v;             <span class="comment"># 设置不存在的键的过期时间,若存在则设置失败</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mset k1 v1 k2 v2 k3 v3    <span class="comment"># 一次性设置多个键值对</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mget k1 k2 k3             <span class="comment"># 一次性获取多个值</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msetnx k1 v1 k5 v5        <span class="comment"># 若存在已有的键,则设置失败,一个都不会生效</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="set（集合-（无序且唯一-一key多value）"><a href="#set（集合-（无序且唯一-一key多value）" class="headerlink" title="set（集合) （无序且唯一  一key多value）"></a>set（集合) （无序且唯一  一key多value）</h3><p>实现:  字典</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">smembers <span class="built_in">set</span>              <span class="comment"># 查看集合中所有的元素</span></span><br><span class="line">sadd <span class="built_in">set</span> 1 2 1 2 3 3      <span class="comment"># 会去重,保证元素的唯一性</span></span><br><span class="line">smember <span class="built_in">set</span></span><br><span class="line">    =&gt;</span><br><span class="line">1) <span class="string">&quot;1&quot;</span></span><br><span class="line">2) <span class="string">&quot;2&quot;</span></span><br><span class="line">3) <span class="string">&quot;3&quot;</span></span><br><span class="line">sismember <span class="built_in">set</span> 9      <span class="comment"># 判断set是否存在该元素</span></span><br><span class="line">scard <span class="built_in">set</span>            <span class="comment"># 获取set中元素的个数</span></span><br><span class="line">SREM <span class="built_in">set</span> 1           <span class="comment"># 删除set中值为&quot;1&quot;的元素   </span></span><br><span class="line">SRANDMEMBER <span class="built_in">set</span> 5    <span class="comment"># 随机出现5个元素</span></span><br><span class="line">spop <span class="built_in">set</span>             <span class="comment"># 随机出栈一个元素</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">smove set1 set2 value //将set1中的value移动到set2中</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sdiff <span class="built_in">set</span> set1  <span class="comment"># 差集</span></span><br><span class="line">sinter <span class="built_in">set</span> set1 <span class="comment"># 交集</span></span><br><span class="line">sunion <span class="built_in">set</span> set1 <span class="comment"># 并集</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="hash（哈希）（一key多value）"><a href="#hash（哈希）（一key多value）" class="headerlink" title="hash（哈希）（一key多value）"></a>hash（哈希）（一key多value）</h3><p>实现:  哈希表</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">hset student name <span class="string">&quot;jack&quot;</span>        <span class="comment"># student为键  name 和 &quot;jack&quot; 键值对为值</span></span><br><span class="line">hget student name               <span class="comment"># 获取student中name的值</span></span><br><span class="line">hmset student name <span class="string">&quot;jack age 21&quot;</span><span class="comment"># 一次性插入多个值</span></span><br><span class="line">hmget student name age          <span class="comment"># 一次性获取多个值</span></span><br><span class="line">hgetall student                 <span class="comment"># 获取键中所有的值</span></span><br><span class="line">HDEL student age                <span class="comment"># 删除单个值</span></span><br><span class="line">hlen student                    <span class="comment"># 获取student的value的长度</span></span><br><span class="line">HEXISTS student age             <span class="comment"># 判断student是否存在某一个值</span></span><br><span class="line">HKEYS student                   <span class="comment"># 查询student中所有的键</span></span><br><span class="line">HVALS student                   <span class="comment"># 查询student中所有的键对应的值</span></span><br><span class="line">HINCRBY student age 2           <span class="comment"># 自定义步长增加age的值</span></span><br><span class="line">HINCRBYFLOAT student age 3.0    <span class="comment"># 自定义步长以浮点类型增加</span></span><br><span class="line">HSETNX student number 1         <span class="comment"># 设置student中不存在的键值 若存在则失败</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="list-列表-字符串链表-一key多value"><a href="#list-列表-字符串链表-一key多value" class="headerlink" title="list (列表) (字符串链表) (一key多value)"></a>list (列表) (字符串链表) (一key多value)</h3><p>结构:  LinkedList</p>
+<p>lrange</p>
+<p>lindex</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Lpush list 1 2 3 4 5 <span class="comment"># 相当于从左边入栈</span></span><br><span class="line">Lrange list 0 -1 </span><br><span class="line">=&gt;</span><br><span class="line">1) <span class="string">&quot;5&quot;</span></span><br><span class="line">2) <span class="string">&quot;4&quot;</span></span><br><span class="line">3) <span class="string">&quot;3&quot;</span></span><br><span class="line">4) <span class="string">&quot;2&quot;</span></span><br><span class="line">5) <span class="string">&quot;1&quot;</span></span><br><span class="line">Lpop list <span class="comment">#  &quot;5&quot;</span></span><br><span class="line">Rpop list <span class="comment">#  &quot;1&quot;    </span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Rpush list 1 2 3 4 5  <span class="comment"># 相当于从右边入栈</span></span><br><span class="line">Lrange list 0 -1</span><br><span class="line">=&gt;</span><br><span class="line">1) <span class="string">&quot;1&quot;</span></span><br><span class="line">2) <span class="string">&quot;2&quot;</span></span><br><span class="line">3) <span class="string">&quot;3&quot;</span></span><br><span class="line">4) <span class="string">&quot;4&quot;</span></span><br><span class="line">5) <span class="string">&quot;5&quot;</span></span><br><span class="line">Lpop list       <span class="comment"># &quot;1&quot;</span></span><br><span class="line">Rpop list       <span class="comment"># &quot;5&quot;</span></span><br><span class="line">Lindex list 2   <span class="comment"># &quot;4&quot; 按照索引从上往下获取元素</span></span><br><span class="line">llen list //3 长度</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LREM list 3 4   <span class="comment"># 删除list中3个4</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">lpush list 1 2 3 4 5 6 7 8</span><br><span class="line">LTRIM list 0 5  <span class="comment"># 将索引从0到5(包括5)的元素截取并重新赋值给list</span></span><br><span class="line">LRANGE list 0 -1   </span><br><span class="line">   = &gt;</span><br><span class="line">    1) <span class="string">&quot;8&quot;</span></span><br><span class="line">    2) <span class="string">&quot;7&quot;</span></span><br><span class="line">    3) <span class="string">&quot;6&quot;</span></span><br><span class="line">    4) <span class="string">&quot;5&quot;</span></span><br><span class="line">    5) <span class="string">&quot;4&quot;</span></span><br><span class="line">    6) <span class="string">&quot;3</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">rpush list1 4 5 6 7</span><br><span class="line">rpush list2 1 2 3</span><br><span class="line">rpoplpush list1 list2 <span class="comment"># &quot;7&quot; 将list1的栈底元素弹出压入到list2栈顶上</span></span><br><span class="line">lrange list2 0 -1</span><br><span class="line">    = &gt;</span><br><span class="line">1) <span class="string">&quot;7&quot;</span></span><br><span class="line">2) <span class="string">&quot;1&quot;</span></span><br><span class="line">3) <span class="string">&quot;2&quot;</span></span><br><span class="line">4) <span class="string">&quot;3&quot;</span></span><br><span class="line">LSET list2 0 9        <span class="comment"># 将索引为0的元素替换为9</span></span><br><span class="line">1) <span class="string">&quot;9&quot;</span></span><br><span class="line">2) <span class="string">&quot;1&quot;</span></span><br><span class="line">3) <span class="string">&quot;2&quot;</span></span><br><span class="line">4) <span class="string">&quot;3&quot;</span></span><br><span class="line">LINSERT list2  before/after 9 10  <span class="comment"># 在元素&quot;9&quot;的前面（后面）插入元素&quot;10&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="Zset（有序集合）-sorted-set"><a href="#Zset（有序集合）-sorted-set" class="headerlink" title="Zset（有序集合）(sorted set)"></a>Zset（有序集合）(sorted set)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">zadd zset 1 v1 2 v2 3 v3</span><br><span class="line">zrange zset 0 -1  <span class="comment"># 正向获取元素</span></span><br><span class="line">    =&gt;</span><br><span class="line">1) <span class="string">&quot;v1&quot;</span></span><br><span class="line">2) <span class="string">&quot;v2&quot;</span></span><br><span class="line">3) <span class="string">&quot;v3&quot;</span></span><br><span class="line">ZREVRANGE zset 0 -1 <span class="comment"># 逆序获取元素</span></span><br><span class="line">    =&gt;</span><br><span class="line">1) <span class="string">&quot;v2&quot;</span></span><br><span class="line">2) <span class="string">&quot;v1&quot;</span></span><br><span class="line">zrange zset 0 -1 withscores <span class="comment"># 正向获取元素带有score</span></span><br><span class="line">    =&gt;</span><br><span class="line">1) <span class="string">&quot;v1&quot;</span></span><br><span class="line">2) <span class="string">&quot;1&quot;</span></span><br><span class="line">3) <span class="string">&quot;v2&quot;</span></span><br><span class="line">4) <span class="string">&quot;2&quot;</span></span><br><span class="line">5) <span class="string">&quot;v3&quot;</span></span><br><span class="line">6) <span class="string">&quot;3&quot;</span></span><br><span class="line">ZRANGEBYSCORE zset  2 3 <span class="comment"># 获取元素按指定的score范围</span></span><br><span class="line">    =&gt;</span><br><span class="line">1) <span class="string">&quot;v2&quot;</span></span><br><span class="line">2) <span class="string">&quot;v3&quot;</span></span><br><span class="line">ZRANGEBYSCORE zset  2 (3    <span class="comment"># &quot;(&quot; 不包括</span></span><br><span class="line">    =&gt;</span><br><span class="line">1) <span class="string">&quot;v2&quot;</span></span><br><span class="line">ZRANGEBYSCORE zset  2 3 <span class="built_in">limit</span> 0 1 <span class="comment"># 从结果集的下标0开始,选择一个元素</span></span><br><span class="line">    =&gt;</span><br><span class="line">1) <span class="string">&quot;v2&quot;</span></span><br><span class="line">ZREM zset v3                      <span class="comment"># 删除元素</span></span><br><span class="line">    =&gt;</span><br><span class="line">1) <span class="string">&quot;v1&quot;</span></span><br><span class="line">2) <span class="string">&quot;v2&quot;</span></span><br><span class="line">ZCARD zset       <span class="comment"># 统计zset中元素的个数</span></span><br><span class="line">    =&gt; </span><br><span class="line">(<span class="built_in">integer</span>) 2</span><br><span class="line">ZCOUNT zset 1 2  <span class="comment"># 统计指定范围内的元素的个数</span></span><br><span class="line">    =&gt;</span><br><span class="line">(<span class="built_in">integer</span>) 2</span><br><span class="line">ZRANK zset v2    <span class="comment"># 拿到指定值的下标</span></span><br><span class="line">    =&gt;</span><br><span class="line">(<span class="built_in">integer</span>) 1</span><br><span class="line">ZSCORE zset v1   <span class="comment"># 获取v1对应的score</span></span><br><span class="line">    =&gt;</span><br><span class="line"><span class="string">&quot;1&quot;</span></span><br><span class="line">ZREVRANK zset v2 <span class="comment"># 逆序获得元素的下标</span></span><br><span class="line"><span class="string">&quot;0&quot;</span></span><br><span class="line">ZREVRANGEBYSCORE zset 2 1 <span class="comment"># 逆序获取元素按照指定的score范围    </span></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">rss</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+              <a href="/tags/NOSQL/" rel="tag"># NOSQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/09/Deep-understanding-of-the-Java-Virtual-Machine-third-edition/" rel="prev" title="Deep understanding of the Java Virtual Machine(third edition)">
+      <i class="fa fa-chevron-left"></i> Deep understanding of the Java Virtual Machine(third edition)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/12/redis%E6%8C%81%E4%B9%85%E5%8C%96/" rel="next" title="redis持久化">
+      redis持久化 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#redis"><span class="nav-number">1.</span> <span class="nav-text">redis</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#redis%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">redis基本知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RDBMS%E5%92%8CNoSQL%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.1.1.</span> <span class="nav-text">RDBMS和NoSQL的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F"><span class="nav-number">1.1.2.</span> <span class="nav-text">分布式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4"><span class="nav-number">1.1.3.</span> <span class="nav-text">集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E7%9A%84CAP%E5%92%8CBASE"><span class="nav-number">1.1.4.</span> <span class="nav-text">分布式数据库中的CAP和BASE</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CAP"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">CAP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BASE"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">BASE</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Key"><span class="nav-number">1.1.5.</span> <span class="nav-text">Key</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis5%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.2.</span> <span class="nav-text">Redis5种数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#String-%E5%AD%97%E7%AC%A6%E4%B8%B2-%EF%BC%88%E4%B8%80key%E5%8D%95value%EF%BC%89"><span class="nav-number">1.2.1.</span> <span class="nav-text">String(字符串)（一key单value）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#set%EF%BC%88%E9%9B%86%E5%90%88-%EF%BC%88%E6%97%A0%E5%BA%8F%E4%B8%94%E5%94%AF%E4%B8%80-%E4%B8%80key%E5%A4%9Avalue%EF%BC%89"><span class="nav-number">1.2.2.</span> <span class="nav-text">set（集合) （无序且唯一  一key多value）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hash%EF%BC%88%E5%93%88%E5%B8%8C%EF%BC%89%EF%BC%88%E4%B8%80key%E5%A4%9Avalue%EF%BC%89"><span class="nav-number">1.2.3.</span> <span class="nav-text">hash（哈希）（一key多value）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#list-%E5%88%97%E8%A1%A8-%E5%AD%97%E7%AC%A6%E4%B8%B2%E9%93%BE%E8%A1%A8-%E4%B8%80key%E5%A4%9Avalue"><span class="nav-number">1.2.4.</span> <span class="nav-text">list (列表) (字符串链表) (一key多value)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Zset%EF%BC%88%E6%9C%89%E5%BA%8F%E9%9B%86%E5%90%88%EF%BC%89-sorted-set"><span class="nav-number">1.2.5.</span> <span class="nav-text">Zset（有序集合）(sorted set)</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="启明"
+      src="https://cdn.qingweico.cn/blog/53fd3cbe09ce49fe809c0dbb32a2f232.jfif">
+  <p class="site-author-name" itemprop="name">启明</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/qingweico" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;qingweico" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zqingwei99@gmail.com" title="E-Mail → mailto:zqingwei99@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">豫ICP备2020030311号 </a>
+  </div>
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">启明</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">83k</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
