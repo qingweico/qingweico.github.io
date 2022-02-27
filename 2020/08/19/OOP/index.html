@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #81C785; /*进度条颜色*/
+        height: 1px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #81C785, 0 0 5px     #81C785; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color:#81C785;    /*上边框颜色*/
+        border-left-color:#81C785;    /*左边框颜色*/
+    }
+</style>
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png">
+  <link rel="mask-icon" href="https://cdn.qingweico.cn/blog/fe4500031cb6f024b4d7.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="JavaScript面向对象[TOC] 实例方法Object实例对象,就是定义在Object原型对象上的方法,可以直接被Object实例直接使用 1234Object.prototype.print &#x3D; function () &amp;#123;    console.log(this);&amp;#125;;Object().print(); &#x2F;&#x2F;Object &amp;#123;&amp;#125;  Object本身是一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript面向对象">
+<meta property="og:url" content="http://example.com/2020/08/19/OOP/index.html">
+<meta property="og:site_name" content="流金岁月">
+<meta property="og:description" content="JavaScript面向对象[TOC] 实例方法Object实例对象,就是定义在Object原型对象上的方法,可以直接被Object实例直接使用 1234Object.prototype.print &#x3D; function () &amp;#123;    console.log(this);&amp;#125;;Object().print(); &#x2F;&#x2F;Object &amp;#123;&amp;#125;  Object本身是一">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-19T10:46:05.000Z">
+<meta property="article:modified_time" content="2020-08-19T10:46:05.000Z">
+<meta property="article:author" content="启明">
+<meta property="article:tag" content="OOP">
+<meta property="article:tag" content="JavaScript">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2020/08/19/OOP/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>JavaScript面向对象 | 流金岁月</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="流金岁月" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">流金岁月</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">流金岁月</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/08/19/OOP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://cdn.qingweico.cn/blog/53fd3cbe09ce49fe809c0dbb32a2f232.jfif">
+      <meta itemprop="name" content="启明">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="流金岁月">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JavaScript面向对象
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-19 18:46:05" itemprop="dateCreated datePublished" datetime="2020-08-19T18:46:05+08:00">2020-08-19</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JavaScript/" itemprop="url" rel="index"><span itemprop="name">JavaScript</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>6.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="JavaScript面向对象"><a href="#JavaScript面向对象" class="headerlink" title="JavaScript面向对象"></a>JavaScript面向对象</h1><p>[TOC]</p>
+<h2 id="实例方法"><a href="#实例方法" class="headerlink" title="实例方法"></a>实例方法</h2><p>Object实例对象,就是定义在Object原型对象上的方法,可以直接被Object实例直接使用</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">print</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="variable language_">this</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="title class_">Object</span>().<span class="title function_">print</span>(); <span class="comment">//Object &#123;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>Object本身是一个函数,通过Object()可以把任何数据类型转换为对象</p>
+<ul>
+<li>将原始数据类型包装为相应的包装对象是实例</li>
+<li>当参数为空时,或者为undefined   null 返回的是空对象</li>
+</ul>
+<p>instanceof运算符用来判断一个对象是否是某个构造函数的实例</p>
+<span id="more"></span>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">isObject</span>(<span class="params">value</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> value === <span class="title class_">Object</span>(value);</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">isObject</span>(&#123;&#125;); <span class="comment">//true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="toLocaleString-NaN"><a href="#toLocaleString-NaN" class="headerlink" title="toLocaleString"></a>toLocaleString</h3><p>toLocaleString返回本地字符串形式    Array 和Number Date用自己定义的toLocaleString形式,而与toString返回的值不一样 下面就是Date的一个实例对象例子返回不一样</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> date = <span class="keyword">new</span> <span class="title class_">Date</span>();</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(date.<span class="title function_">toString</span>());      <span class="comment">//Sat Jul 11 2020 10:32:40 GMT+0800 (中国标准时间) </span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(date.<span class="title function_">toLocaleString</span>());<span class="comment">//2020/7/11 上午10:32:40</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h2><p>new Object(value)表示新生成一个对象,并且它的值是value,而Object(value)则是将value转换为一个对象,二者的语义是不同的</p>
+<h2 id="静态方法"><a href="#静态方法" class="headerlink" title="静态方法"></a>静态方法</h2><h3 id="Object-keys"><a href="#Object-keys" class="headerlink" title="Object.keys();"></a>Object.keys();</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="title function_">keys</span>();                 <span class="comment">//参数为一个对象,方法会返回一个由一个给定对象的自身可枚举属性组成的数组</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Object-getOwnPropertyNames"><a href="#Object-getOwnPropertyNames" class="headerlink" title="Object.getOwnPropertyNames();"></a>Object.getOwnPropertyNames();</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="title function_">getOwnPropertyNames</span>();  <span class="comment">//用法和Object().keys()类似 但是该方法还会遍历不可枚举类型的属性.返回一个数组</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Object-prototype-valueOf"><a href="#Object-prototype-valueOf" class="headerlink" title="Object.prototype.valueOf();"></a>Object.prototype.valueOf();</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="title function_">valueOf</span>();    <span class="comment">//返回该对象的值,默认的是返回其本身</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Object-prototype-toString"><a href="#Object-prototype-toString" class="headerlink" title="Object.prototype.toString();"></a>Object.prototype.toString();</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="title function_">toString</span>();   <span class="comment">//返回该对象的字符串形式</span></span><br></pre></td></tr></table></figure>
+
+<p>对一个对象调用toString()方法时,会返回[object,Object]</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//可以对任何值调用toString()方法,而不会受自定义 toString()方法的影响</span></span><br><span class="line"><span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">toString</span>.<span class="title function_">call</span>(&#123;&#125;); <span class="comment">//[object Object]</span></span><br><span class="line"><span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">toString</span>.<span class="title function_">call</span>([]); <span class="comment">//[object Array]</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//下面是一个比typeof运算符判断类型更准确的函数</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">type</span>(<span class="params">value</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> s = <span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">toString</span>.<span class="title function_">call</span>(value);</span><br><span class="line">    <span class="keyword">return</span> s.<span class="title function_">match</span>(<span class="regexp">/\[object (.*?)\]/</span>)[<span class="number">1</span>].<span class="title function_">toLowerCase</span>();</span><br><span class="line">&#125;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">type</span>(<span class="literal">null</span>)); <span class="comment">//null</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Object-prototype-hasOwnProperty-property"><a href="#Object-prototype-hasOwnProperty-property" class="headerlink" title="Object.prototype.hasOwnProperty(property)"></a>Object.prototype.hasOwnProperty(property)</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="title function_">hasOwnProperty</span>(property);<span class="comment">//判断该对象是否具有该属性(property) 返回Boolean类型</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Object-getOwnPropertyDescriptor"><a href="#Object-getOwnPropertyDescriptor" class="headerlink" title="Object.getOwnPropertyDescriptor()"></a>Object.getOwnPropertyDescriptor()</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="title function_">getOwnPropertyDescriptor</span>();<span class="comment">//方法可以获取属性的描述对象,第一个参数是目标对象,第二个参数是一个字符串,为该对象的属性</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> obj = &#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;jack&quot;</span>&#125;;</span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">getOwnPropertyDescriptor</span>(obj,<span class="string">&quot;name&quot;</span>);</span><br><span class="line"><span class="attr">configurable</span>: <span class="literal">true</span></span><br><span class="line"><span class="attr">enumerable</span>: <span class="literal">true</span></span><br><span class="line"><span class="attr">value</span>: <span class="string">&quot;jack&quot;</span></span><br><span class="line"><span class="attr">writable</span>: <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">print</span> = <span class="keyword">function</span>(<span class="params"></span>)&#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="variable language_">this</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title class_">Object</span>.<span class="title function_">keys</span>(<span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>)); <span class="comment">//Array [ &quot;print&quot; ]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Object-defineProperty"><a href="#Object-defineProperty" class="headerlink" title="Object.defineProperty()"></a>Object.defineProperty()</h3><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="module-access"><span class="module"><span class="identifier">Object</span>.</span></span>define<span class="constructor">Property()</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> object = <span class="title class_">Object</span>.<span class="title function_">defineProperty</span>(&#123;&#125;,<span class="string">&quot;p&quot;</span>,&#123;</span><br><span class="line">    <span class="comment">//get()&#123;return &quot;这里是get方法&quot;;&#125;,     //注意get方法和value不能同时定义 且get方法存在时,writable的值只能是false</span></span><br><span class="line">    <span class="attr">value</span>: <span class="string">&quot;我是属性p属性描述对象的value&quot;</span>,  </span><br><span class="line">    <span class="attr">writable</span>: <span class="literal">true</span>,                       <span class="comment">//表示属性值是否可以改变</span></span><br><span class="line">    <span class="attr">enumerable</span>: <span class="literal">true</span>,                     <span class="comment">//表示该数属性是否可以遍历</span></span><br><span class="line">    <span class="attr">configurable</span>: <span class="literal">false</span>                   <span class="comment">//表示可配置性,false可以阻止操作改写该属性,包括删除该属性,或者该属性的属性                                          描述对象(但是value除外)</span></span><br><span class="line">&#125;);                                       <span class="comment">//以上都为Boolean类型,且默认都为true</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">object.<span class="property">p</span>;<span class="comment">//&quot;我是属性p属性描述对象的value&quot;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">object.<span class="property">p</span> = <span class="string">&quot;我的值无法被外界修改&quot;</span>;<span class="comment">//当writable值为false时注意直接对目标属性赋值是无法修改的但是以下方式仍可以修改对之前value的覆盖</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(object.<span class="property">p</span>);         <span class="comment">//&quot;我的值无法被外界修改&quot;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="title function_">defineProperty</span>(object,<span class="string">&quot;p&quot;</span>,&#123;<span class="attr">value</span>: <span class="string">&quot;我的值可以被改变&quot;</span>&#125;);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(object.<span class="property">p</span>);         <span class="comment">//&quot;我的值可以被改变&quot;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="keyword">delete</span> object.<span class="property">p</span>);  <span class="comment">//false  无法删除该属性</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> newObject = <span class="title class_">Object</span>.<span class="title function_">defineProperties</span>(&#123;&#125;,&#123;</span><br><span class="line">    <span class="attr">p1</span>:&#123;<span class="attr">value</span>: <span class="string">&quot;我是属性p1中值&quot;</span> ,<span class="attr">enumerable</span>:<span class="literal">true</span>&#125;,</span><br><span class="line">    <span class="attr">p2</span>:&#123;<span class="attr">value</span>: <span class="string">&quot;我是属性p2中的值&quot;</span> ,<span class="attr">enumerable</span>:<span class="literal">true</span>&#125;,</span><br><span class="line">    <span class="attr">p3</span>:&#123;<span class="title function_">get</span>(<span class="params"></span>)&#123;<span class="keyword">return</span> newObject.<span class="property">p1</span> + <span class="string">&quot;---&quot;</span> + newObject.<span class="property">p2</span>&#125;,</span><br><span class="line">        <span class="attr">enumerable</span>:<span class="literal">true</span>,</span><br><span class="line">        <span class="attr">configurable</span>:<span class="literal">true</span>&#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(newObject.<span class="property">p3</span>);<span class="comment">//我是属性p1中值---我是属性p2中的值 </span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(newObject.<span class="title function_">propertyIsEnumerable</span>(<span class="string">&quot;p3&quot;</span>));   <span class="comment">//true  该方法用来判断对象中某个属性是否可以遍历</span></span><br></pre></td></tr></table></figure>
+
+<p>如果原型独对象的某个属性的属性描述对象writable的值为false,那么子对象将无法自定义这个属性</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> proto = <span class="title class_">Object</span>.<span class="title function_">defineProperty</span>(&#123;&#125;,<span class="string">&quot;foo&quot;</span>,&#123;<span class="attr">value</span>: <span class="string">&quot;我是属性foo的值&quot;</span>,<span class="attr">writable</span>:<span class="literal">false</span>&#125;); <span class="comment">//这里是原型对象</span></span><br><span class="line"><span class="keyword">let</span> sub = <span class="title class_">Object</span>.<span class="title function_">create</span>(proto);                                                      <span class="comment">//这里是创建proto的子对象</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(sub.<span class="property">foo</span>);          <span class="comment">//我是属性foo的值</span></span><br><span class="line">sub.<span class="property">foo</span> = <span class="string">&quot;我是子对象foo属性的值&quot;</span>;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(sub.<span class="property">foo</span>);          <span class="comment">//我是属性foo的值</span></span><br><span class="line"><span class="comment">/*该属性值已被锁定,子对象无法修改  但是可以通过子对象属性描述对象对父类的覆盖,此时会完全忽视原型链*/</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = &#123;&#125;;</span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">defineProperty</span>(a ,<span class="string">&#x27;property&#x27;</span>,&#123;</span><br><span class="line">    <span class="attr">value</span>: <span class="string">&quot;values&quot;</span>,</span><br><span class="line">    <span class="attr">enumerable</span>: <span class="literal">false</span>  <span class="comment">//不可遍历</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">let</span> key <span class="keyword">in</span> a)&#123;</span><br><span class="line">    <span class="keyword">if</span>(a.<span class="title function_">hasOwnProperty</span>(key))</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(key);</span><br><span class="line">&#125;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title class_">Object</span>.<span class="title function_">keys</span>(a)); <span class="comment">//Array []</span></span><br><span class="line"><span class="comment">/*enumerable为true则为以下结果</span></span><br><span class="line"><span class="comment">[&quot;property&quot;]</span></span><br><span class="line"><span class="comment">0: &quot;property&quot;</span></span><br><span class="line"><span class="comment">length: 1*/</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="存储器-相当与java中private修饰变量时使用get和set方法"><a href="#存储器-相当与java中private修饰变量时使用get和set方法" class="headerlink" title="存储器 相当与java中private修饰变量时使用get和set方法"></a>存储器 相当与java中private修饰变量时使用get和set方法</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> o = &#123;</span><br><span class="line">    <span class="attr">value</span>:<span class="number">5</span>,</span><br><span class="line">    <span class="keyword">get</span> <span class="title function_">p</span>()&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">value</span>;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="keyword">set</span> <span class="title function_">p</span>(<span class="params">value</span>)&#123;</span><br><span class="line">        <span class="keyword">if</span>(value &gt; <span class="variable language_">this</span>.<span class="property">value</span>)&#123;<span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">value</span> = value;&#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&quot;新的值必须大于5,请重新输入&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">o.<span class="property">p</span> = <span class="number">10</span>;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(o.<span class="property">p</span>);      <span class="comment">//10</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(o.<span class="property">p</span> = <span class="number">4</span>);  <span class="comment">//报错</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> o = &#123;</span><br><span class="line">       <span class="attr">value</span>:<span class="number">5</span>,</span><br><span class="line">       <span class="attr">p</span>:&#123;</span><br><span class="line">           <span class="title function_">get</span>(<span class="params"></span>)</span><br><span class="line">           &#123;</span><br><span class="line">               <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">value</span>;</span><br><span class="line">           &#125;,</span><br><span class="line">           <span class="title function_">set</span>(<span class="params">value</span>)</span><br><span class="line">           &#123;</span><br><span class="line">               <span class="keyword">if</span>(value &gt; <span class="variable language_">this</span>.<span class="property">value</span>)&#123;<span class="variable language_">this</span>.<span class="property">value</span> = value;&#125;</span><br><span class="line">               <span class="keyword">else</span> <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&quot;新的值必须大于5,请重新输入&quot;</span>);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;;</span><br><span class="line">   o.<span class="property">p</span> = <span class="number">10</span>;</span><br><span class="line">   <span class="variable language_">console</span>.<span class="title function_">log</span>(o.<span class="property">p</span>);       <span class="comment">//10</span></span><br><span class="line">   <span class="variable language_">console</span>.<span class="title function_">log</span>(o.<span class="property">p</span>.<span class="title function_">set</span>(<span class="number">4</span>));<span class="comment">//4</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="对象的拷贝"><a href="#对象的拷贝" class="headerlink" title="对象的拷贝"></a>对象的拷贝</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> copy = <span class="keyword">function</span> (<span class="params">newObj,oldObj</span>)&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">let</span> property <span class="keyword">in</span> oldObj)&#123;</span><br><span class="line">        <span class="keyword">if</span>(oldObj.<span class="title function_">hasOwnProperty</span>(property))&#123;</span><br><span class="line">            newObj[property] = oldObj[property];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newObj;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>若遇到含有存储器的对象,需要使用Object.defineProperty()方法来拷贝对象</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> extend = <span class="keyword">function</span>(<span class="params">to, <span class="keyword">from</span></span>)&#123;</span><br><span class="line">   <span class="keyword">for</span>(<span class="keyword">let</span> property <span class="keyword">in</span> <span class="keyword">from</span>)&#123;</span><br><span class="line">       <span class="keyword">if</span>(!<span class="keyword">from</span>.<span class="title function_">hasOwnProperty</span>(property)) <span class="keyword">continue</span>;</span><br><span class="line">       <span class="title class_">Object</span>.<span class="title function_">defineProperty</span>(to,property,<span class="title class_">Object</span>.<span class="title function_">getOwnPropertyDescriptor</span>(<span class="keyword">from</span>,property));</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> to;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> to = &#123;&#125;;</span><br><span class="line"><span class="title function_">extend</span>(to,&#123;<span class="attr">foo</span>:<span class="string">&quot;我为foo属性的值&quot;</span>,</span><br><span class="line">    <span class="title function_">get</span>(<span class="params"></span>)&#123;<span class="keyword">return</span> <span class="string">&quot;我被修改成了&quot;</span> + <span class="variable language_">this</span>.<span class="property">foo</span>&#125;,</span><br><span class="line">    set (value)&#123;<span class="variable language_">this</span>.<span class="property">foo</span> = value;&#125;&#125;);</span><br><span class="line">to.<span class="title function_">set</span>(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(to.<span class="title function_">get</span>()); <span class="comment">//我被修改成了Hello World</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(to.<span class="property">foo</span>);   <span class="comment">//Hello World</span></span><br></pre></td></tr></table></figure>
+
+<p>注意get() 与 get foo()是不一样的 前者是对象中的一个普通的方法,而后者则是属性foo的属性描述对象中的存储器</p>
+<h2 id="控制对象状态"><a href="#控制对象状态" class="headerlink" title="控制对象状态"></a>控制对象状态</h2><h3 id="Object-preventExtensions"><a href="#Object-preventExtensions" class="headerlink" title="Object.preventExtensions()"></a>Object.preventExtensions()</h3><p>防止对象再添加其他的属性   但可以删除旧的属性    但仍可以改变属性的值</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> demoObj = &#123;<span class="attr">foo</span>:<span class="string">&quot;我是属性foo的值&quot;</span>,<span class="attr">id</span>:<span class="number">7</span>,<span class="attr">country</span>:<span class="string">&quot;China&quot;</span>&#125;;</span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">preventExtensions</span>(demoObj);</span><br><span class="line"><span class="keyword">delete</span> demoObj.<span class="property">id</span>;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(demoObj.<span class="property">id</span>); <span class="comment">//undefined  </span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(demoObj);    <span class="comment">//Object &#123; foo: &quot;我是属性foo的值&quot;, country: &quot;China&quot;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="title function_">defineProperty</span>(demoObj,<span class="string">&quot;p&quot;</span>,&#123;<span class="attr">value</span>:<span class="number">123</span>&#125;);<span class="comment">//报错 Uncaught TypeError: can&#x27;t define property &quot;p&quot;: Object is not extensible</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Object-isExtensible"><a href="#Object-isExtensible" class="headerlink" title="Object.isExtensible()"></a>Object.isExtensible()</h3><p> 检查是否可以向对象中添加新属性</p>
+<h3 id="Object-seal"><a href="#Object-seal" class="headerlink" title="Object.seal()"></a>Object.seal()</h3><p>该方法无法向对象中添加新属性,也无法删除旧的属性  实质是把属性描述对象的configurable变为false 同样可以改变属性的值</p>
+<h3 id="Object-isSealed"><a href="#Object-isSealed" class="headerlink" title="Object.isSealed()"></a>Object.isSealed()</h3><p>检查对象是否使用了seal方法</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">javalet sealObject=&#123;<span class="attr">strength</span>:<span class="number">100</span>&#125;;</span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">seal</span>(sealObject); </span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">defineProperty</span>(sealObject,<span class="string">&quot;speed&quot;</span>,&#123;<span class="attr">value</span>:<span class="number">120</span>,<span class="attr">configurable</span>:<span class="literal">true</span>&#125;);/ can<span class="string">&#x27;t define property &quot;speed&quot;: Object is not extensible</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Object-freeze"><a href="#Object-freeze" class="headerlink" title="Object.freeze()"></a>Object.freeze()</h3><p> 使对象无法添加新的属性,也无法删除旧的属性,而且也无法修改属性的值,使得该对象变成了常量</p>
+<h3 id="Object-isFrozen"><a href="#Object-isFrozen" class="headerlink" title="Object.isFrozen()"></a>Object.isFrozen()</h3><p>检查对象是否使用了freeze方法</p>
+<p>上面三种方法的局限性就是可以通过改变原型对象来给对象增加属性</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> protoObject = <span class="title class_">Object</span>();</span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">freeze</span>(protoObject);</span><br><span class="line"><span class="keyword">let</span> createObject = <span class="title class_">Object</span>.<span class="title function_">getPrototypeOf</span>(protoObject);</span><br><span class="line">createObject.<span class="property">p</span> = <span class="string">&quot;value&quot;</span>;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(protoObject.<span class="property">p</span>);  <span class="comment">//&quot;value&quot;</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(protoObject);    <span class="comment">//但就protoObject对象本身而言仍然是个空对象</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title class_">Object</span>.<span class="title function_">keys</span>(createObject));   <span class="comment">//Array [ &quot;p&quot; ]</span></span><br></pre></td></tr></table></figure>
+
+<p>还有一件事就是如果对象的属性仍然是对象的话那么这些方法只能冻结属性指向的对象,而无法冻结对象本身的内容,就像const一样,虽然不能改变变量的内存地址但是仍然可以会改变其内容</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">rss</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OOP/" rel="tag"># OOP</a>
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/19/article/" rel="prev" title="心灵">
+      <i class="fa fa-chevron-left"></i> 心灵
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/19/MySQL%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/" rel="next" title="MySQL主从复制">
+      MySQL主从复制 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JavaScript%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.</span> <span class="nav-text">JavaScript面向对象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">实例方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#toLocaleString-NaN"><span class="nav-number">1.1.1.</span> <span class="nav-text">toLocaleString</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.</span> <span class="nav-text">构造函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.</span> <span class="nav-text">静态方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-keys"><span class="nav-number">1.3.1.</span> <span class="nav-text">Object.keys();</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-getOwnPropertyNames"><span class="nav-number">1.3.2.</span> <span class="nav-text">Object.getOwnPropertyNames();</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-prototype-valueOf"><span class="nav-number">1.3.3.</span> <span class="nav-text">Object.prototype.valueOf();</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-prototype-toString"><span class="nav-number">1.3.4.</span> <span class="nav-text">Object.prototype.toString();</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-prototype-hasOwnProperty-property"><span class="nav-number">1.3.5.</span> <span class="nav-text">Object.prototype.hasOwnProperty(property)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-getOwnPropertyDescriptor"><span class="nav-number">1.3.6.</span> <span class="nav-text">Object.getOwnPropertyDescriptor()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-defineProperty"><span class="nav-number">1.3.7.</span> <span class="nav-text">Object.defineProperty()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8-%E7%9B%B8%E5%BD%93%E4%B8%8Ejava%E4%B8%ADprivate%E4%BF%AE%E9%A5%B0%E5%8F%98%E9%87%8F%E6%97%B6%E4%BD%BF%E7%94%A8get%E5%92%8Cset%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.8.</span> <span class="nav-text">存储器 相当与java中private修饰变量时使用get和set方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%8B%B7%E8%B4%9D"><span class="nav-number">1.3.9.</span> <span class="nav-text">对象的拷贝</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%AF%B9%E8%B1%A1%E7%8A%B6%E6%80%81"><span class="nav-number">1.4.</span> <span class="nav-text">控制对象状态</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-preventExtensions"><span class="nav-number">1.4.1.</span> <span class="nav-text">Object.preventExtensions()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-isExtensible"><span class="nav-number">1.4.2.</span> <span class="nav-text">Object.isExtensible()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-seal"><span class="nav-number">1.4.3.</span> <span class="nav-text">Object.seal()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-isSealed"><span class="nav-number">1.4.4.</span> <span class="nav-text">Object.isSealed()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-freeze"><span class="nav-number">1.4.5.</span> <span class="nav-text">Object.freeze()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-isFrozen"><span class="nav-number">1.4.6.</span> <span class="nav-text">Object.isFrozen()</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="启明"
+      src="https://cdn.qingweico.cn/blog/53fd3cbe09ce49fe809c0dbb32a2f232.jfif">
+  <p class="site-author-name" itemprop="name">启明</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/qingweico" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;qingweico" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zqingwei99@gmail.com" title="E-Mail → mailto:zqingwei99@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">豫ICP备2020030311号 </a>
+  </div>
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">启明</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">208k</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
